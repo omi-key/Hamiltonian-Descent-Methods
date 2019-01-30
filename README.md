@@ -8,4 +8,4 @@ ipynb: https://github.com/omi-key/Hamiltonian-Descent-Methods/blob/master/HDMs.i
 
 qiita: https://qiita.com/omi_UT/items/2fa312de3ed3518b7e60
 
-![graph](https://github.com/omi-key/Hamiltonian-Descent-Methods/blob/master/vsepoch_log.png?raw=true)
+![graph](https://github.com/omi-key/Hamiltonian-Descent-Methods/blob/master/vstime_log.png?raw=true)

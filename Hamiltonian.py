@@ -11,8 +11,8 @@ from chainer import Variable
 import chainer.functions as F
 
 _default_hyperparam = optimizer.Hyperparameter()
-_default_hyperparam.epsilon = 0.1
-_default_hyperparam.delta = 0.95
+_default_hyperparam.epsilon = 1
+_default_hyperparam.delta = 0.6
 
 
 class HamiltonianRule(optimizer.UpdateRule):
@@ -23,6 +23,7 @@ class HamiltonianRule(optimizer.UpdateRule):
     """
     
     _kernel = None
+    _kernel_2 = None
     
     def __init__(self, parent_hyperparam=None,
                  epsilon=None, delta=None, body=None, tail=None, expon=None):
@@ -36,7 +37,7 @@ class HamiltonianRule(optimizer.UpdateRule):
     def init_state(self, param):
         xp = backend.get_array_module(param.data)
         with cuda.get_device_from_array(param.data):
-            self.state['p'] = xp.zeros_like(param.data)
+            self.state['p'] = xp.zeros_like(param.data) 
         
         
     def update_core_cpu(self, param):
@@ -46,20 +47,11 @@ class HamiltonianRule(optimizer.UpdateRule):
         hp = self.hyperparam
         p = self.state['p']
         
-        p_ip1 = hp.delta * p - hp.epsilon * hp.delta * grad
+        p = hp.delta * p - hp.epsilon * hp.delta * grad
+        sqsum = np.vdot(p,p)
         
-        p_ip1var = Variable(p_ip1)
-        
-        sqsum = chainer.functions.sum(p_ip1var ** 2.0)
-        kinetic = (1+ sqsum) ** 0.5-1
-        
-        kinetic.backward()
-        grad_k = p_ip1var.grad
-        
-        p = p_ip1
-        param.data += hp.epsilon * grad_k
-        
-     
+        param.data += hp.epsilon / (1.0 + sqsum) * p
+
     def update_core_gpu(self, param):
         grad = param.grad
         if grad is None:
@@ -67,19 +59,20 @@ class HamiltonianRule(optimizer.UpdateRule):
         hp = self.hyperparam
         p = self.state['p']
         
-        p_ip1 = hp.delta * p - hp.epsilon * hp.delta * grad
-        
-        p_ip1var = Variable(p_ip1)
+        if HamiltonianRule._kernel is None:
+            HamiltonianRule._kernel = cuda.elementwise(
+                'T delta, T epsilon, T grad', 'T p',
+                'p *= delta; p -= epsilon * delta * grad;',
+                'Hamiltonian_p')
+        HamiltonianRule._kernel(hp.delta, hp.epsilon, grad, p)
 
-        sqsum = chainer.functions.sum(p_ip1var ** 2.0)
-        kinetic = (1+ sqsum ) ** 0.5-1
+        sqsum = cuda.cupy.vdot(p,p)
+        if HamiltonianRule._kernel_2 is None:
+            HamiltonianRule._kernel_2 = cuda.elementwise(
+                'T epsilon, T p, T sqsum', 'T param', 
+                'param += epsilon * p / (1.0 + sqsum)', 'Hamiltonian_q')
         
-        kinetic.backward()
-        grad_k = p_ip1var.grad
-        
-        p = p_ip1
-        param.data += hp.epsilon * grad_k
-        
+        HamiltonianRule._kernel_2(hp.epsilon, p, sqsum, param.data)
 
 class Hamiltonian(optimizer.GradientMethod):
     def __init__(self,
