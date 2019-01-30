@@ -7,5 +7,6 @@ Chris J. Maddison, Daniel Paulin, Yee Whye Tec, Brendan O’Donoghue and Arnaud 
 ipynb: https://github.com/omi-key/Hamiltonian-Descent-Methods/blob/master/HDMs.ipynb
 
 qiita: https://qiita.com/omi_UT/items/2fa312de3ed3518b7e60
+　　　　https://qiita.com/omi_UT/items/07e366e56b20dbfd50de
 
 ![graph](https://github.com/omi-key/Hamiltonian-Descent-Methods/blob/master/vstime_log.png?raw=true)
