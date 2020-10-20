@@ -6,11 +6,11 @@ Chris J. Maddison, Daniel Paulin, Yee Whye Tec, Brendan O’Donoghue and Arnaud 
 
 ipynb: https://github.com/omi-key/Hamiltonian-Descent-Methods/blob/master/HDMs.ipynb (Chainer)
 
-　　　　 https://github.com/omi-key/Hamiltonian-Descent-Methods/blob/master/julialang.ipynb.ipynb (Flux.jl)
+　　　　 https://github.com/omi-key/Hamiltonian-Descent-Methods/blob/master/julialang.ipynb (Flux.jl)
 
-qiita: https://qiita.com/omi_UT/items/2fa312de3ed3518b7e60 
+qiita: https://github.com/omi-key/Hamiltonian-Descent-Methods/blob/master/2fa312de3ed3518b7e60.md
 
-　　　　https://qiita.com/omi_UT/items/07e366e56b20dbfd50de
+　　　　https://github.com/omi-key/Hamiltonian-Descent-Methods/blob/master/07e366e56b20dbfd50de.md
 
 ![graph](https://github.com/omi-key/Hamiltonian-Descent-Methods/blob/master/vstime_log.png?raw=true)
 
